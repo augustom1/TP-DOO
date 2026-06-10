@@ -1,4 +1,4 @@
-# El Universo — Sistema de gestión de tienda de cómics
+# CCM (Comics, cartas, manga) — Sistema de gestión de tienda de cómics
 
 Sistema por consola para gestionar una tienda de cómics y coleccionables. Desarrollado en Python 3, sin librerías externas.
 
