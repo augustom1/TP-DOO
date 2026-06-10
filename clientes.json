@@ -1,0 +1,74 @@
+[
+  {
+    "numero": 1,
+    "nombre": "Lionel",
+    "apellido": "Messi",
+    "dni": "30123456",
+    "email": "lionel@messi.com",
+    "telefono": "1122334455",
+    "direccion": "Av. Corrientes 1234"
+  },
+  {
+    "numero": 2,
+    "nombre": "Angel",
+    "apellido": "Di Maria",
+    "dni": "28765432",
+    "email": "angel@dimaria.com",
+    "telefono": "1133445566",
+    "direccion": "Av. Santa Fe 567"
+  },
+  {
+    "numero": 3,
+    "nombre": "Lautaro",
+    "apellido": "Martinez",
+    "dni": "35678901",
+    "email": "lautaro@email.com",
+    "telefono": "1144556677",
+    "direccion": "Calle Falsa 123"
+  },
+  {
+    "numero": 4,
+    "nombre": "Javier",
+    "apellido": "Mascherano",
+    "dni": "40234567",
+    "email": "javier@mascherano.com",
+    "telefono": "1155667788",
+    "direccion": "Belgrano 890"
+  },
+  {
+    "numero": 5,
+    "nombre": "Emiliano",
+    "apellido": "Martinez",
+    "dni": "22345678",
+    "email": "emiliano@email.com",
+    "telefono": "1166778899",
+    "direccion": "Lavalle 456"
+  },
+  {
+    "numero": 6,
+    "nombre": "Sergio",
+    "apellido": "Aguero",
+    "dni": "38901234",
+    "email": "sergio@email.com",
+    "telefono": "1177889900",
+    "direccion": "Palermo 789"
+  },
+  {
+    "numero": 7,
+    "nombre": "Leandro",
+    "apellido": "Paredes",
+    "dni": "31456789",
+    "email": "leandro@email.com",
+    "telefono": "1188990011",
+    "direccion": "Recoleta 321"
+  },
+  {
+    "numero": 8,
+    "nombre": "Julian",
+    "apellido": "Alvarez",
+    "dni": "45678901",
+    "email": "julian@email.com",
+    "telefono": "1199001122",
+    "direccion": "Montserrat 654"
+  }
+]
