@@ -1,13 +1,6 @@
-# CCM (Comics, cartas, manga) — Sistema de gestión de tienda de cómics
+# CCM — Sistema de gestión de tienda de cómics, cartas y manga
 
-Sistema por consola para gestionar una tienda de cómics y coleccionables. Desarrollado en Python 3, sin librerías externas.
-
-Soporta tres tipos de operaciones:
-- **Ventas**: registro de ventas del stock propio de la tienda
-- **Alquileres**: préstamo temporal con cálculo de multa por atraso
-- **Consignaciones**: un cliente trae su propio artículo para que la tienda lo venda; al concretarse, cobra su porcentaje acordado
-
-Los clientes se guardan en `clientes.json` y persisten entre sesiones.
+Sistema de gestión por consola desarrollado en Python 3, sin librerías externas. Permite administrar el catálogo de una tienda de coleccionables y registrar tres tipos de operaciones: ventas, alquileres y consignaciones.
 
 ---
 
@@ -17,56 +10,89 @@ Los clientes se guardan en `clientes.json` y persisten entre sesiones.
 python main.py
 ```
 
-Requiere Python 3.10 o superior. Sin dependencias externas.
+Requiere Python 3.10 o superior. Al iniciar, el sistema carga un catálogo de artículos de ejemplo y lee los clientes registrados desde `clientes.json`.
 
-Al arrancar, el sistema carga 40 artículos de ejemplo (13 cómics, 11 mangas, 11 cartas y 5 packs) y lee los clientes desde `clientes.json`.
+---
+
+## Funcionalidades
+
+### Catálogo
+- Agregar artículos de cuatro tipos: **Comic**, **Manga**, **Carta** y **Pack de cartas**
+- Buscar artículos por título, editorial, personaje, autor, juego u otros campos según el tipo
+- Listar artículos disponibles o ver el catálogo completo con su estado actual
+
+### Clientes
+- Registrar clientes con nombre, apellido, DNI, email, teléfono y dirección
+- Buscar cliente por DNI
+- Los clientes persisten entre sesiones en `clientes.json`
+- Al registrar una operación, si el cliente no existe se puede dar de alta en el momento
+
+### Ventas
+- Registrar la venta definitiva de un artículo del catálogo propio a un cliente
+- Ver historial completo de ventas
+
+### Alquileres
+- Registrar el préstamo temporal de un artículo indicando días y precio por día
+- Registrar la devolución de un alquiler activo
+- Ver alquileres activos y alquileres vencidos
+- Cálculo automático de multa por días de atraso en la devolución
+
+### Consignaciones
+- Recibir un artículo de un cliente para que la tienda lo venda en su nombre
+- Configurar el precio de venta y el porcentaje que le corresponde al cliente (default: 70%)
+- Registrar la venta del artículo en consignación, con cálculo automático del pago al cliente y la ganancia de la tienda
+- Devolver el artículo al cliente si decide retirarlo sin vender
+- Ver consignaciones activas y vendidas
 
 ---
 
 ## Estructura del proyecto
 
 ```
-main.py          — menú por consola
-tienda.py        — fachada del sistema: toda la lógica de negocio pasa por acá
+main.py          — menú por consola, punto de entrada
+tienda.py        — fachada del sistema: toda la lógica de negocio
 material.py      — jerarquía de artículos: Material (abstracta), Comic, Manga, Carta, Pack
 cliente.py       — clase Cliente
-transaccion.py   — Venta, Alquiler y Consignacion
-datos_ejemplo.py — artículos y transacciones de demo (se carga al iniciar)
+transaccion.py   — Venta, Alquiler, Consignacion
+datos_ejemplo.py — catálogo y transacciones de demo
 clientes.json    — base de datos de clientes (se actualiza automáticamente)
 ```
 
 ---
 
-## Estado inicial al arrancar
+## Diseño orientado a objetos
 
-El sistema arranca con 5 transacciones de ejemplo ya cargadas:
+### Jerarquía de artículos
 
-| # | Tipo | Artículo | Cliente |
-|---|------|----------|---------|
-| Venta #1 | Venta | Batman: Year One | Lionel Messi |
-| Alquiler #1 | Alquiler (7 días) | One Piece Vol. 1 | Angel Di Maria |
-| Alquiler #2 | Alquiler (3 días) | Saga #1 | Javier Mascherano |
-| Consignación #1 | Consignación | Mox Sapphire — $45.000 (75% cliente → $33.750) | Lautaro Martinez |
-| Consignación #2 | Consignación | The Dark Knight Returns — $7.000 (70% cliente → $4.900) | Emiliano Martinez |
+`Material` es una clase abstracta que define el comportamiento común a todos los artículos: código, título, precio, condición física y estado de disponibilidad. No puede instanciarse directamente.
 
----
+Cada subclase agrega los atributos propios de su tipo e implementa el método abstracto `tipo()`:
 
-## Flujo de prueba por operación
+| Clase | Atributos específicos |
+|-------|-----------------------|
+| `Comic` | editorial, número de edición, personaje/serie |
+| `Manga` | editorial, volumen, autor |
+| `Carta` | juego, rareza |
+| `Pack` | juego, cantidad de cartas, edición |
 
-### Consignación completa
-1. **Consignaciones → 3** (ver activas): vas a ver los IDs disponibles
-2. **Consignaciones → 2** (registrar venta): ingresás el ID, el sistema muestra cuánto le corresponde al cliente
-3. **Consignaciones → 4** (ver vendidas): confirmás que quedó registrada
+El estado de un artículo sigue este flujo:
 
-Para devolver un artículo sin vender: **Consignaciones → 5** (muestra la lista y pedí el ID).
+```
+Disponible ──► Alquilado  ──► Disponible   (tras devolución)
+           └──► Vendido                    (estado final)
+```
 
-### Alquiler y devolución
-1. **Alquileres → 1**: ingresás código del artículo, DNI del cliente, días y precio/día
-2. **Alquileres → 2**: muestra los alquileres activos, elegís el ID para registrar la devolución
-3. Si ya venció la fecha, **Alquileres → 4** muestra los vencidos con la multa acumulada
+### Transacciones
 
-### Venta directa
-**Ventas → 1**: pedí código del artículo y DNI del cliente. Si el cliente no está registrado, lo podés agregar en el momento.
+Cada tipo de operación es una clase independiente con su propia lógica:
+
+- **`Venta`**: registra artículo, cliente, precio y fecha.
+- **`Alquiler`**: registra días pactados, precio por día, fecha de vencimiento y devolución. Calcula multa si hay atraso.
+- **`Consignacion`**: registra precio de venta y porcentaje acordado. Calcula el pago al cliente y la comisión de la tienda al momento de la venta.
+
+### Tienda como fachada
+
+La clase `Tienda` centraliza toda la lógica de negocio. El menú (`main.py`) interactúa únicamente con esta clase, sin acceder directamente a los artículos, clientes ni transacciones. Antes de cada operación, `Tienda` valida disponibilidad del artículo, estado del cliente y consistencia de los datos.
 
 ---
 
